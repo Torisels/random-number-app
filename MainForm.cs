@@ -12,7 +12,8 @@ namespace RandomNumberApp
             decimal d = (decimal) 1 / 3;
             d = d * 3;
             //d = Decimal.Floor(d);
-
+            Connector c= new Connector();
+           // c.parseDataToDecimals();
             Console.WriteLine(d);
             /*SQLiteConnection.CreateFile("MyDatabase.sqlite");
             m_dbConnection =
