@@ -22,7 +22,7 @@ namespace RandomNumberApp
         private const string J_METHOD = "generateDecimalFractions";
 
         private readonly Uri BaseUrl = new Uri(@"https://api.random.org");
-        //private readonly Uri RelativeUrl = new Uri("https://api.random.org/json-rpc/1/invoke");
+        //private readonly Uri RelativeUrl = new Uri("https://api.random.org/json-rpc/1/invoke"); //TODO uncomment this
         private readonly Uri RelativeUrl = new Uri("http://torisels.w.staszic.waw.pl/~torisels/apitest/"); //DEV
 
         private const string mediaType = "application/json";
@@ -79,7 +79,7 @@ namespace RandomNumberApp
         public Connector()
         {
             setUpConnection();
-            sendRequest();
+            //sendRequest();
         }
 
         private void setUpConnection()
@@ -93,11 +93,13 @@ namespace RandomNumberApp
             };
         }
 
-        private async void sendRequest()
+        public async Task sendRequest()
         {
+            await Task.Delay(1500);
             var response = await client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
             Decimals = ParseDataToDecimals(content);
+
         }
 
         private string createRequestJsonString()
@@ -122,11 +124,11 @@ namespace RandomNumberApp
         {
             dynamic json =  JsonConvert.DeserializeObject(jsonString);
 
-            List<decimal> decimals = new List<decimal>();
+            var decimals = new List<decimal>();
 
             foreach (string s in json.result.random.data)
             {
-                decimals.Add(Decimal.Parse(s));
+                decimals.Add(decimal.Parse(s));
             }
             return decimals.ToArray();
         }
