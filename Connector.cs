@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Bson;
 using Newtonsoft.Json.Linq;
 
 namespace RandomNumberApp
@@ -21,14 +18,14 @@ namespace RandomNumberApp
         private const string J_JRPC_VERSION = "2.0";
         private const string J_METHOD = "generateDecimalFractions";
 
-        private readonly Uri BaseUrl = new Uri(@"https://api.random.org");
+        private readonly Uri _baseUrl = new Uri(@"https://api.random.org");
         //private readonly Uri RelativeUrl = new Uri("https://api.random.org/json-rpc/1/invoke"); //TODO uncomment this
-        private readonly Uri RelativeUrl = new Uri("http://torisels.w.staszic.waw.pl/~torisels/apitest/"); //DEV
+        private readonly Uri _relativeUrl = new Uri("http://torisels.w.staszic.waw.pl/~torisels/apitest/"); //DEV
 
         private const string mediaType = "application/json";
 
-        private HttpClient client;
-        private HttpRequestMessage request;
+        private HttpClient _client;
+        private HttpRequestMessage _request;
 
       
 
@@ -39,67 +36,28 @@ namespace RandomNumberApp
             return Decimals ?? null;
         }
 
-        private const string devtest = @"{
-              ""jsonrpc"": ""2.0"",
-              ""result"": {
-                ""random"": {
-                  ""data"": [
-                    0.528603664155,
-                    0.10317942408449,
-                    0.9692723586187,
-                    0.9856829677046,
-                    0.14391010617136,
-                    0.28573503037159,
-                    0.64049629998182,
-                    0.04481570717269,
-                    0.63144861445594,
-                    0.4119882205557,
-                    0.76425400681331,
-                    0.5425395852179,
-                    0.6770498138576,
-                    0.92375606406131,
-                    0.89409554338424,
-                    0.30871961303879,
-                    0.81877002777878,
-                    0.066600326656812,
-                    0.19553387620782,
-                    0.6400705932094
-                  ],
-                  ""completionTime"": ""2017-11-16 20:44:05Z""
-                },
-                ""bitsUsed"": 1329,
-                ""bitsLeft"": 248671,
-                ""requestsLeft"": 999,
-                ""advisoryDelay"": 0
-              },
-              ""id"": ""0""
-            }";
-
-
         public Connector()
         {
-            setUpConnection();
-            //sendRequest();
+            SetUpConnection();
         }
 
-        private void setUpConnection()
+        private void SetUpConnection()
         {
-            client = new HttpClient {BaseAddress = BaseUrl};
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
+            _client = new HttpClient {BaseAddress = _baseUrl};
+            _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType));
 
-            request = new HttpRequestMessage(HttpMethod.Post, RelativeUrl)
+            _request = new HttpRequestMessage(HttpMethod.Post, _relativeUrl)
             {
                 Content = new StringContent(createRequestJsonString(), Encoding.UTF8, mediaType)
             };
         }
 
-        public async Task sendRequest()
+        public async Task SendRequest()
         {
             await Task.Delay(1500);
-            var response = await client.SendAsync(request);
+            var response = await _client.SendAsync(_request);
             var content = await response.Content.ReadAsStringAsync();
             Decimals = ParseDataToDecimals(content);
-
         }
 
         private string createRequestJsonString()
@@ -120,7 +78,7 @@ namespace RandomNumberApp
             return JsonConvert.SerializeObject(o);
         }
 
-        private decimal[] ParseDataToDecimals(string jsonString = devtest)
+        private decimal[] ParseDataToDecimals(string jsonString)
         {
             dynamic json =  JsonConvert.DeserializeObject(jsonString);
 

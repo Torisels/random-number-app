@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RandomNumberApp
 {
     class Random
     {
-        private decimal[] _randomDecimals;
-        private Dictionary<int, int> _probability;
+        private readonly decimal[] _randomDecimals;
+        private readonly Dictionary<int, int> _probability;
 
-        private decimal _space = 0;
+        private decimal _space;
 
         public Random(decimal[] randomDecimals, Dictionary<int, int> probability)
         {
@@ -21,17 +18,17 @@ namespace RandomNumberApp
 
         public HashSet<int> Randomize()
         {
-            calculateSpace();
+            CalculateSpace();
             HashSet<int> people = new HashSet<int>();
             foreach (var random in _randomDecimals)
             {
-                people.Add(getPerson(random));
+                people.Add(GetPerson(random));
             }
             return people;
         }
 
 
-        private void calculateSpace()
+        private void CalculateSpace()
         {
             int countOfReducedProbability = _probability.Count(k => k.Value == 1);
 
@@ -40,7 +37,7 @@ namespace RandomNumberApp
             _space = (decimal) 1 / segments;
         }
 
-        private int getPerson(decimal generatedNumber)
+        private int GetPerson(decimal generatedNumber)
         {
             decimal lastPos = 0;
             decimal currentPos = 0;

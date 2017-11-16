@@ -31,7 +31,7 @@ namespace RandomNumberApp
             progressBar1.Visible = true;
             progressBar1.Style = ProgressBarStyle.Marquee;
 
-            await _connection.sendRequest();
+            await _connection.SendRequest();
 
             btnLosuj.Enabled = true;
             progressBar1.Visible = false;
