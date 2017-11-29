@@ -54,7 +54,6 @@ namespace RandomNumberApp
 
         public async Task SendRequest()
         {
-            await Task.Delay(1500);
             var response = await _client.SendAsync(_request);
             var content = await response.Content.ReadAsStringAsync();
             Decimals = ParseDataToDecimals(content);
@@ -77,7 +76,10 @@ namespace RandomNumberApp
 
             return JsonConvert.SerializeObject(o);
         }
-
+        /**
+         * This method parses the JSON data to List of Decimals.
+         * 
+         * **/
         private decimal[] ParseDataToDecimals(string jsonString)
         {
             dynamic json =  JsonConvert.DeserializeObject(jsonString);
