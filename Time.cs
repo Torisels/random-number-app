@@ -31,11 +31,11 @@ namespace RandomNumberApp
 
 
 
-        private void getBells()
+        private void getBells(Dictionary<int, BellTime> dict)
         {
             /* DB method*/
 
-            bellsDictionary =  new Dictionary<int, BellTime> {{8, new BellTime ("14:00","16:00")}, { 9, new BellTime("16:00", "17:00") } };
+            bellsDictionary = dict;
         }
 
         private int determineNumberOfLesson()
@@ -58,6 +58,8 @@ namespace RandomNumberApp
     }
     class BellTime
     {
+        public DateTime TimeStart { get; set; }
+        public DateTime TimeEnd { get; set; }
 
         public BellTime(string start, string end)
         {
@@ -76,7 +78,6 @@ namespace RandomNumberApp
         }
 
 
-        public DateTime TimeStart { get; set; }
-        public DateTime TimeEnd { get; set; }
+
     }
 }

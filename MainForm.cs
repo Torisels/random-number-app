@@ -15,10 +15,9 @@ namespace RandomNumberApp
             CustomInitialization();
             UiChanger = this;
              _connection = new Connector();
-            /*SQLiteConnection.CreateFile("MyDatabase.sqlite");
-            m_dbConnection =
-                new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
-            m_dbConnection.Open();*/
+               Db d = new Db();
+            d.universalQuery("SELECT * from Bells");
+            var a = d.getBells();
 
             Time time = new Time();
 
