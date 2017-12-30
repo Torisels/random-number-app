@@ -32,6 +32,9 @@
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.btnLosuj = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column3 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.menuStripMain = new System.Windows.Forms.MenuStrip();
             this.plikToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,9 +42,6 @@
             this.edycjaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.opcjeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.labelWylosowaniUczniowie = new System.Windows.Forms.Label();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.labelTillTheEnd = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStripMain.SuspendLayout();
@@ -94,6 +94,28 @@
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
             this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
+            // Column1
+            // 
+            this.Column1.FillWeight = 10F;
+            this.Column1.HeaderText = "Lp";
+            this.Column1.Name = "Column1";
+            this.Column1.ReadOnly = true;
+            this.Column1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // Column2
+            // 
+            this.Column2.FillWeight = 75.22755F;
+            this.Column2.HeaderText = "Imię i nazwisko";
+            this.Column2.Name = "Column2";
+            this.Column2.ReadOnly = true;
+            // 
+            // Column3
+            // 
+            this.Column3.FillWeight = 15F;
+            this.Column3.HeaderText = "Wywołany";
+            this.Column3.Name = "Column3";
+            this.Column3.ReadOnly = true;
+            // 
             // menuStripMain
             // 
             this.menuStripMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -116,7 +138,7 @@
             // oAplikacjiToolStripMenuItem
             // 
             this.oAplikacjiToolStripMenuItem.Name = "oAplikacjiToolStripMenuItem";
-            this.oAplikacjiToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.oAplikacjiToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
             this.oAplikacjiToolStripMenuItem.Text = "O aplikacji";
             // 
             // edycjaToolStripMenuItem
@@ -143,28 +165,6 @@
             this.labelWylosowaniUczniowie.TabIndex = 6;
             this.labelWylosowaniUczniowie.Text = "Wylosowani uczniowie:";
             // 
-            // Column1
-            // 
-            this.Column1.FillWeight = 10F;
-            this.Column1.HeaderText = "Lp";
-            this.Column1.Name = "Column1";
-            this.Column1.ReadOnly = true;
-            this.Column1.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            // 
-            // Column2
-            // 
-            this.Column2.FillWeight = 75.22755F;
-            this.Column2.HeaderText = "Imię i nazwisko";
-            this.Column2.Name = "Column2";
-            this.Column2.ReadOnly = true;
-            // 
-            // Column3
-            // 
-            this.Column3.FillWeight = 15F;
-            this.Column3.HeaderText = "Wywołany";
-            this.Column3.Name = "Column3";
-            this.Column3.ReadOnly = true;
-            // 
             // labelTillTheEnd
             // 
             this.labelTillTheEnd.AutoSize = true;
@@ -174,6 +174,7 @@
             this.labelTillTheEnd.Size = new System.Drawing.Size(237, 20);
             this.labelTillTheEnd.TabIndex = 7;
             this.labelTillTheEnd.Text = "Do końca lekcji pozostało: 12:47";
+            this.labelTillTheEnd.Click += new System.EventHandler(this.labelTillTheEnd_Click);
             // 
             // MainForm
             // 

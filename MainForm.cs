@@ -1,26 +1,25 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RandomNumberApp
 {
     public partial class MainForm : Form
     {
-        private Connector _connection;
+        private readonly Connector _connection;
 
         private static MainForm UiChanger;
-       // SQLiteConnection m_dbConnection;
+        private Time _time;
+
         public MainForm()
         {
             InitializeComponent();
             CustomInitialization();
             UiChanger = this;
-             _connection = new Connector();
-               Db d = new Db();
-            d.universalQuery("SELECT * from Bells");
-            var a = d.getBells();
-
-            Time time = new Time();
-
+            _connection = new Connector();
+            _time = new Time();
+            test();
+            handleLessonTime();
         }
 
         private async  void btnLosuj_Click(object sender, EventArgs e)
@@ -64,19 +63,60 @@ namespace RandomNumberApp
         }
         
         //this method display how much time is left till the end of the lesson
-        public static void SetTextOnTimeLabel(string time)
+        public static void SetTextOnTimeLabel(string s)
         {
             if (UiChanger.labelTillTheEnd.InvokeRequired)
             {
                 Action<string> method = SetTextOnTimeLabel;
-                UiChanger.BeginInvoke(method, time);
+                UiChanger.BeginInvoke(method, s);
             }
             else
             {
-                UiChanger.labelTillTheEnd.Text = "Do końca lekcji pozostało: "+ time;
+                UiChanger.labelTillTheEnd.Text = s;
             }
         }
 
+        public void test()
+        {
+           Time t = new Time();
+            Console.WriteLine(
+            Time.getTimeDifference(DateTime.Parse("16:14"), DateTime.Parse("15:50")));
+            t.checkIfLessonIsToday();
+        }
+
+        public void handleLessonTime()
+        {
+            Task.Run(() =>
+            {
+              
+                while (true)
+                {
+                    if (!_time.checkIfLessonIsToday())
+                    {
+                        SetTextOnTimeLabel("Nie masz dzisiaj lekcji");
+                        return;
+                    }
+                    if (DateTime.Now>_time.getTodayEndLessonTime())
+                    {
+                        SetTextOnTimeLabel("Twoje lekcje skończyły się");
+                        return;
+                    }
+                    if (_time.DetermineNumberOfLesson() == -1)
+                    {
+                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: ");
+ 
+                        return;
+                    }
+                        SetTextOnTimeLabel("Do końca lekcji pozostało: ");
+                    
+                }
+            });
+        }
+
+        private void labelTillTheEnd_Click(object sender, EventArgs e)
+        {
+
+        }
 
     }
 }

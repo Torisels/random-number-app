@@ -25,9 +25,7 @@ namespace RandomNumberApp
             {
                 while (rdr.Read())
                 {
-                    Console.Write("{0} ", rdr["time_start"]);
-                    Console.Write("{0} ", rdr["time_end"]);
-                    Console.Write("{0} \n", rdr["Number"]);
+                   
                 }
             }
         }
@@ -45,6 +43,27 @@ namespace RandomNumberApp
                 }
             }
             return dict;
+        }
+
+        public List<int> getLessonsForToday(int day)
+        {
+            var lessons = new List<int>();
+            SQLiteCommand cmd = new SQLiteCommand("SELECT Number FROM Lessons where Day = @day",Connection);
+            cmd.Parameters.Add(new SQLiteParameter("@day", day));
+         
+            using (SQLiteDataReader rdr = cmd.ExecuteReader())
+            {
+                while (rdr.Read())
+                {
+                    if (rdr[0].GetType() != typeof(DBNull))
+                    {
+                        var v = (string)rdr.GetValue(0);
+                        Console.WriteLine(v.Length);
+                        lessons = v.Split(',').Select(n => Convert.ToInt32(n)).ToList();
+                    }
+                }
+            }
+            return lessons;
         }
     }
 }
