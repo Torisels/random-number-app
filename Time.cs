@@ -10,15 +10,14 @@ namespace RandomNumberApp
 {
     class Time
     {
-        private readonly DateTime _currentDay;
-        private DateTime MasterDate;
 
+        public DateTime MasterDate;
 
+        /*bells fetched from Db*/
         private Dictionary<int, BellTime> bellsDictionary;
-
         private int _numberOfLesson = -1;
 
-        private TimeSpan _ringOffset;
+        private TimeSpan _bellOffset;
         private int _dayOfWeek;
 
 
@@ -27,15 +26,11 @@ namespace RandomNumberApp
 
         public Time()
         {
-         _currentDay = DateTime.Today;
-         _dayOfWeek = (int)_currentDay.DayOfWeek;
-          MasterDate = DateTime.Now;
+          RefreshTime();
+          _dayOfWeek = (int)MasterDate.DayOfWeek;
           _db = new Db();
-            getBells();
+          getBells();
         }
-
-
-
         private void getBells()
         {
             bellsDictionary = _db.getBells();
@@ -55,13 +50,13 @@ namespace RandomNumberApp
 
         private void getRingOffsetFromConfig()
         {
-            _ringOffset = new TimeSpan(0, Properties.Settings.Default.TimeOffsetMin,
+            _bellOffset = new TimeSpan(0, Properties.Settings.Default.TimeOffsetMin,
                 Properties.Settings.Default.TimeOffsetSec);
         }
 
         public bool checkIfLessonIsToday()
         {
-            List<int> lessons = _db.getLessonsForToday(5); //TODO CHANGE
+            List<int> lessons = _db.getLessonsForToday(_dayOfWeek);
             if (lessons.Count == 0)
                 return false;
 
@@ -75,24 +70,50 @@ namespace RandomNumberApp
             return bellsDictionary[max].TimeEnd;
         }
 
-        public static string getTimeDifference(DateTime one, DateTime two)
+        public DateTime getLessonTimeStart(int lesson)
         {
-            TimeSpan diff = one.Subtract(two);         
-            DateTime di = UnixTimeStampToDateTime(diff.Seconds);
-            if (di.Hour == 0)
-                return di.ToString("HH:mm");
+            return bellsDictionary[lesson].TimeStart;
+        }
 
-            return string.Empty;
+        public DateTime getLessonTimeEnd(int lesson)
+        {
+            return bellsDictionary[lesson].TimeEnd;
+        }
+
+        public int GetNearestLesson()
+        {
+            foreach (var lesson in _todayLessons)
+            {
+                if (MasterDate <= bellsDictionary[lesson].TimeStart && MasterDate <= bellsDictionary[lesson].TimeEnd)
+                    return lesson;
+            }
+
+            return -1;
+        }
+
+        public static string GetTimeDifference(DateTime one, DateTime two)
+        {
+            TimeSpan diff = one.Subtract(two);
+            if (diff.Hours == 0)
+                return diff.ToString(@"mm\:ss");
+            return diff.ToString(@"hh\:mm\:ss");
         }
 
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
         }
 
+        public void RefreshTime()
+        {
+            if(Properties.Settings.Default.TImeOffsetSignNegative)
+                MasterDate = DateTime.Now - _bellOffset;
+            else
+                MasterDate = DateTime.Now + _bellOffset;
+        }
 
     }
     class BellTime

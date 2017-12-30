@@ -40,5 +40,14 @@ namespace RandomNumberApp.Properties {
                 return ((int)(this["TimeOffsetSec"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TImeOffsetSignNegative {
+            get {
+                return ((bool)(this["TImeOffsetSignNegative"]));
+            }
+        }
     }
 }

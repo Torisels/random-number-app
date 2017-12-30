@@ -80,7 +80,7 @@ namespace RandomNumberApp
         {
            Time t = new Time();
             Console.WriteLine(
-            Time.getTimeDifference(DateTime.Parse("16:14"), DateTime.Parse("15:50")));
+            Time.GetTimeDifference(DateTime.Parse("16:14"), DateTime.Parse("16:50")));
             t.checkIfLessonIsToday();
         }
 
@@ -101,13 +101,16 @@ namespace RandomNumberApp
                         SetTextOnTimeLabel("Twoje lekcje skończyły się");
                         return;
                     }
-                    if (_time.DetermineNumberOfLesson() == -1)
+
+                    int lesson = _time.DetermineNumberOfLesson();
+
+                    if (lesson == -1)
                     {
-                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: ");
+                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: "+ Time.GetTimeDifference(_time.MasterDate, _time.getLessonTimeStart(_time.GetNearestLesson())));
  
                         return;
                     }
-                        SetTextOnTimeLabel("Do końca lekcji pozostało: ");
+                        SetTextOnTimeLabel("Do końca lekcji pozostało: "+ Time.GetTimeDifference(_time.MasterDate, _time.getLessonTimeEnd(lesson)));
                     
                 }
             });
