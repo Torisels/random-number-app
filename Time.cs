@@ -14,15 +14,15 @@ namespace RandomNumberApp
         public DateTime MasterDate;
 
         /*bells fetched from Db*/
-        private Dictionary<int, BellTime> bellsDictionary;
+        private Dictionary<int, BellTime> _bellsDictionary;
         private int _numberOfLesson = -1;
 
         private TimeSpan _bellOffset;
-        private int _dayOfWeek;
+        private readonly int _dayOfWeek;
 
 
         private List<int> _todayLessons;
-        private Db _db;
+        private readonly Db _db;
 
         public Time()
         {
@@ -33,13 +33,13 @@ namespace RandomNumberApp
         }
         private void getBells()
         {
-            bellsDictionary = _db.getBells();
+            _bellsDictionary = _db.getBells();
         }
 
         public int DetermineNumberOfLesson()
         {
-            if (bellsDictionary == null) return -1;
-            foreach (var o in bellsDictionary)
+            if (_bellsDictionary == null) return -1;
+            foreach (var o in _bellsDictionary)
             {
                 if (MasterDate >= o.Value.TimeStart && MasterDate <= o.Value.TimeEnd)
                     return o.Key;
@@ -67,24 +67,24 @@ namespace RandomNumberApp
         public DateTime getTodayEndLessonTime()
         {
             int max = _todayLessons.Max();
-            return bellsDictionary[max].TimeEnd;
+            return _bellsDictionary[max].TimeEnd;
         }
 
         public DateTime getLessonTimeStart(int lesson)
         {
-            return bellsDictionary[lesson].TimeStart;
+            return _bellsDictionary[lesson].TimeStart;
         }
 
         public DateTime getLessonTimeEnd(int lesson)
         {
-            return bellsDictionary[lesson].TimeEnd;
+            return _bellsDictionary[lesson].TimeEnd;
         }
 
         public int GetNearestLesson()
         {
             foreach (var lesson in _todayLessons)
             {
-                if (MasterDate <= bellsDictionary[lesson].TimeStart && MasterDate <= bellsDictionary[lesson].TimeEnd)
+                if (MasterDate <= _bellsDictionary[lesson].TimeStart && MasterDate <= _bellsDictionary[lesson].TimeEnd)
                     return lesson;
             }
 

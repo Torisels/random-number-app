@@ -1,18 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace RandomNumberApp
 {
-    class Random
+    class RandomM
     {
-        private readonly decimal[] _randomDecimals;
+        private decimal[] _randomDecimals = new decimal[30];
         private readonly Dictionary<int, int> _probability;
 
         private decimal _space;
 
-        public Random(decimal[] randomDecimals, Dictionary<int, int> probability)
+        public RandomM(Dictionary<int, int> probability)
         {
-            _randomDecimals = randomDecimals;
+            generateDoubles();
             _probability = probability;
         }
 
@@ -27,6 +28,14 @@ namespace RandomNumberApp
             return people;
         }
 
+        private void generateDoubles()
+        {
+            var rn = new Random();
+            for (int i = 0; i < 30; i++)
+            {
+                _randomDecimals[i] = Convert.ToDecimal(rn.NextDouble());
+            }
+        }
 
         private void CalculateSpace()
         {

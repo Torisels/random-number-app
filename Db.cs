@@ -65,5 +65,16 @@ namespace RandomNumberApp
             }
             return lessons;
         }
+
+        public Dictionary<int, Dictionary<string, string>> randomNumbersToPeople(HashSet<int> numbers)
+        {
+            Dictionary<int,Dictionary<string,string>> ret = new Dictionary<int, Dictionary<string, string>>();
+            string In = string.Join(",", numbers);
+            string qry = "SELECT Name,Surname from Students where Id IN (@{In})";
+
+
+
+            return ret;
+        }
     }
 }

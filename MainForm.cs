@@ -82,6 +82,8 @@ namespace RandomNumberApp
             Console.WriteLine(
             Time.GetTimeDifference(DateTime.Parse("16:14"), DateTime.Parse("16:50")));
             t.checkIfLessonIsToday();
+            RandomM m = new RandomM();
+
         }
 
         public void handleLessonTime()
