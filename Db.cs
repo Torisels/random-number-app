@@ -10,10 +10,11 @@ namespace RandomNumberApp
 {
     class Db
     {
-        SQLiteConnection Connection = new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
+        private SQLiteConnection Connection = null; 
 
         public Db()
         {
+            Connection = new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
             Connection.Open();
         }
 
@@ -71,9 +72,6 @@ namespace RandomNumberApp
             Dictionary<int,Dictionary<string,string>> ret = new Dictionary<int, Dictionary<string, string>>();
             string In = string.Join(",", numbers);
             string qry = "SELECT Name,Surname from Students where Id IN (@{In})";
-
-
-
             return ret;
         }
     }

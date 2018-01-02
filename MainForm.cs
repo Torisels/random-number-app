@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -10,6 +11,7 @@ namespace RandomNumberApp
 
         private static MainForm UiChanger;
         private Time _time;
+        private Sql sql;
 
         public MainForm()
         {
@@ -20,6 +22,10 @@ namespace RandomNumberApp
             _time = new Time();
             test();
             handleLessonTime();
+            var s = new Ssh();
+            sql = s.EstablishMySQLConnection();
+            var t =  sql.GetBellOffset();
+
         }
 
         private async  void btnLosuj_Click(object sender, EventArgs e)
@@ -82,7 +88,8 @@ namespace RandomNumberApp
             Console.WriteLine(
             Time.GetTimeDifference(DateTime.Parse("16:14"), DateTime.Parse("16:50")));
             t.checkIfLessonIsToday();
-            RandomM m = new RandomM();
+            RandomM m = new RandomM(new Dictionary<int, int>{});
+            Console.WriteLine("xd");
 
         }
 
@@ -95,12 +102,12 @@ namespace RandomNumberApp
                 {
                     if (!_time.checkIfLessonIsToday())
                     {
-                        SetTextOnTimeLabel("Nie masz dzisiaj lekcji");
+                        SetTextOnTimeLabel("Nie ma dzisiaj lekcji");
                         return;
                     }
                     if (DateTime.Now>_time.getTodayEndLessonTime())
                     {
-                        SetTextOnTimeLabel("Twoje lekcje skończyły się");
+                        SetTextOnTimeLabel("Lekcje skończyły się");
                         return;
                     }
 
@@ -123,5 +130,10 @@ namespace RandomNumberApp
 
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine(
+            sql.GetBellOffset());
+        }
     }
 }

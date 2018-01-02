@@ -301,5 +301,6 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 
+id_rsa
 # OpenCover UI analysis results
 OpenCover/
