@@ -115,6 +115,11 @@ namespace RandomNumberApp
                 MasterDate = DateTime.Now + _bellOffset;
         }
 
+        public static string SQLiteDateFormat()
+        {
+            return DateTime.Now.ToString("yyyy-MM-dd");
+        }
+
     }
     class BellTime
     {

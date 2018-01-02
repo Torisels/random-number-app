@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -25,7 +26,13 @@ namespace RandomNumberApp
             var s = new Ssh();
             sql = s.EstablishMySQLConnection();
             var t =  sql.GetBellOffset();
-
+            var gg  = Time.SQLiteDateFormat();
+            var cccc = new Db();
+            var ff = cccc.getNearestDateOfLesson();
+            var kjk = cccc.GetProbability();
+            var rrr = new RandomM(kjk);
+            var g = rrr.Randomize();
+            var kjkjk = g.Where(x => x <= 9).ToList();
         }
 
         private async  void btnLosuj_Click(object sender, EventArgs e)
