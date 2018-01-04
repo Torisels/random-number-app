@@ -24,12 +24,15 @@ namespace RandomNumberApp
         private List<int> _todayLessons;
         private readonly Db _db;
 
-        public Time()
+        public string verifiedDateString;
+
+        public Time(Db db)
         {
           RefreshTime();
           _dayOfWeek = (int)MasterDate.DayOfWeek;
-          _db = new Db();
+          _db = db;
           getBells();
+          verifiedDateString = Time.SqLiteDateFormat(); //TODO change upgrade
         }
         private void getBells()
         {
@@ -115,9 +118,13 @@ namespace RandomNumberApp
                 MasterDate = DateTime.Now + _bellOffset;
         }
 
-        public static string SQLiteDateFormat()
+        public static string SqLiteDateFormat()
         {
             return DateTime.Now.ToString("yyyy-MM-dd");
+        }
+        public static string SqLiteDateFormatCustom(DateTime date)
+        {
+            return date.ToString("yyyy-MM-dd");
         }
 
     }

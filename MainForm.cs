@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -8,57 +9,82 @@ namespace RandomNumberApp
 {
     public partial class MainForm : Form
     {
-        private readonly Connector _connection;
 
         private static MainForm UiChanger;
-        private Time _time;
-        private Sql sql;
+        private readonly Time _time;
+        private readonly Sql _sql;
+        private readonly Db _db;
+        private RandomM _rand;
+        private readonly Ssh _ssh;
 
         public MainForm()
         {
+            UiChanger = this;
             InitializeComponent();
             CustomInitialization();
-            UiChanger = this;
-            _connection = new Connector();
-            _time = new Time();
-            test();
+            _db = new Db();
+            _time = new Time(_db);
+            _ssh = new Ssh();
+            _sql = _ssh.EstablishMySQLConnection();
             handleLessonTime();
-            var s = new Ssh();
-            sql = s.EstablishMySQLConnection();
-            var t =  sql.GetBellOffset();
-            var gg  = Time.SQLiteDateFormat();
-            var cccc = new Db();
-            var ff = cccc.getNearestDateOfLesson();
-            var kjk = cccc.GetProbability();
-            var rrr = new RandomM(kjk);
-            var g = rrr.Randomize();
-            var kjkjk = g.Where(x => x <= 9).ToList();
+
+
+
+
+   ;
         }
 
-        private async  void btnLosuj_Click(object sender, EventArgs e)
+
+        private void btnLosuj_Click(object sender, EventArgs e)
         {
-            btnLosuj.Enabled = false;
-            progressBar1.Visible = true;
-            progressBar1.Style = ProgressBarStyle.Marquee;
+            //            btnLosuj.Enabled = false;
+            //            progressBar1.Visible = true;
+            //            progressBar1.Style = ProgressBarStyle.Marquee;
+            //
+            //            await _connection.SendRequest();
+            //
+            //            btnLosuj.Enabled = true;
+            //            progressBar1.Visible = false;
 
-            await _connection.SendRequest();
 
-            btnLosuj.Enabled = true;
-            progressBar1.Visible = false;
+
+                var rand = new RandomM(_db.GetProbability());
+                var randomPeopleHashSet = rand.Randomize();
+
+                var fullRandomPeople = _db.GetDrawnPeople(randomPeopleHashSet);
+                
+
+
+            foreach (var ee in randomPeopleHashSet)
+            {
+                AddElementToDataGridView(ee, fullRandomPeople[ee],false);
+            }
+
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            Console.WriteLine("sss");
-        }
+//        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+//        {
+//            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+//            {
+//                var x = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+//                Console.WriteLine("sss"+x);
+//            }
+//        }
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            if (e.RowIndex >= 0 && e.ColumnIndex == 2)
             {
-                var x = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-                Console.WriteLine(x);
+                bool current = !(bool) dataGridView1.Rows[e.RowIndex].Cells[2].Value;
+                _db.AddRemoveUserPresence((int)dataGridView1.Rows[e.RowIndex].Cells[0].Value, _time.verifiedDateString , current);
+
+                dataGridView1.Rows[e.RowIndex].Cells[2].Value = current;
             }
+        }
+        void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedCells.Count > 0)
+                dataGridView1.ClearSelection();
         }
 
         private void AddElementToDataGridView(int number, string name,bool checkbox)
@@ -91,30 +117,31 @@ namespace RandomNumberApp
 
         public void test()
         {
-           Time t = new Time();
+           //Time t = new Time();
             Console.WriteLine(
             Time.GetTimeDifference(DateTime.Parse("16:14"), DateTime.Parse("16:50")));
-            t.checkIfLessonIsToday();
+       //     t.checkIfLessonIsToday();
             RandomM m = new RandomM(new Dictionary<int, int>{});
             Console.WriteLine("xd");
 
         }
 
-        public void handleLessonTime()
+        public async void handleLessonTime()
         {
-            Task.Run(() =>
+            await Task.Delay(1000);
+            await Task.Run(() =>
             {
               
                 while (true)
                 {
                     if (!_time.checkIfLessonIsToday())
                     {
-                        SetTextOnTimeLabel("Nie ma dzisiaj lekcji");
+                        SetTextOnTimeLabel("Nie ma dzisiaj lekcji.");
                         return;
                     }
                     if (DateTime.Now>_time.getTodayEndLessonTime())
                     {
-                        SetTextOnTimeLabel("Lekcje skończyły się");
+                        SetTextOnTimeLabel("Lekcje skończyły się.");
                         return;
                     }
 
@@ -140,7 +167,12 @@ namespace RandomNumberApp
         private void button1_Click(object sender, EventArgs e)
         {
             Console.WriteLine(
-            sql.GetBellOffset());
+            _sql.GetBellOffset());
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

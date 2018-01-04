@@ -11,19 +11,19 @@ using Microsoft.SqlServer.Server;
 
 namespace RandomNumberApp
 {
-    class Db
+    internal class Db
     {
-        private SQLiteConnection Connection = null; 
+        private readonly SQLiteConnection _connection; 
 
         public Db()
         {
-            Connection = new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
-            Connection.Open();
+            _connection = new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
+            _connection.Open();
         }
 
         public void universalQuery(string query)
         {
-            SQLiteCommand command = new SQLiteCommand(query, Connection);
+            SQLiteCommand command = new SQLiteCommand(query, _connection);
 
             using (SQLiteDataReader rdr = command.ExecuteReader())
             {
@@ -37,7 +37,7 @@ namespace RandomNumberApp
         public Dictionary<int, BellTime> getBells()
         {
             Dictionary<int, BellTime> dict = new Dictionary<int, BellTime>();
-            SQLiteCommand command = new SQLiteCommand("SELECT * from Bells", Connection);
+            SQLiteCommand command = new SQLiteCommand("SELECT * from Bells", _connection);
 
             using (SQLiteDataReader rdr = command.ExecuteReader())
             {
@@ -52,7 +52,7 @@ namespace RandomNumberApp
         public List<int> getLessonsForToday(int day)
         {
             var lessons = new List<int>();
-            SQLiteCommand cmd = new SQLiteCommand("SELECT Number FROM Lessons where Day = @day",Connection);
+            SQLiteCommand cmd = new SQLiteCommand("SELECT Number FROM Lessons where Day = @day",_connection);
             cmd.Parameters.Add(new SQLiteParameter("@day", day));
          
             using (SQLiteDataReader rdr = cmd.ExecuteReader())
@@ -69,22 +69,13 @@ namespace RandomNumberApp
             }
             return lessons;
         }
-
-        public Dictionary<int, Dictionary<string, string>> randomNumbersToPeople(HashSet<int> numbers)
-        {
-            Dictionary<int,Dictionary<string,string>> ret = new Dictionary<int, Dictionary<string, string>>();
-            string In = string.Join(",", numbers);
-            string qry = "SELECT Name,Surname from Students where Id IN (@{In})";
-            return ret;
-        }
-
         public Dictionary<int, int> GetProbability()
         {
             Dictionary<int, int> ret = new Dictionary<int, int>();
             List<int> single = new List<int>();
 
-            SQLiteCommand cmd = new SQLiteCommand("SELECT Student FROM Registry where Date = @day ", Connection);
-            cmd.Parameters.Add(new SQLiteParameter("@day", getNearestDateOfLesson()));
+            SQLiteCommand cmd = new SQLiteCommand("SELECT Student FROM Registry where Date = @day ", _connection);
+            cmd.Parameters.Add(new SQLiteParameter("@day", GetNearestDateOfLesson()));
 
             using (SQLiteDataReader rdr = cmd.ExecuteReader())
             {
@@ -104,24 +95,48 @@ namespace RandomNumberApp
                     ret.Add(i,2);
                 }
             }
-
-
-            return ret;
+           return ret;
         }
 
-        public string getNearestDateOfLesson()
+        public string GetNearestDateOfLesson()
         {
-            SQLiteCommand cmd = new SQLiteCommand("SELECT Date FROM Registry where Date < @day ORDER BY Date DESC LIMIT 1", Connection);
-                        cmd.Parameters.Add(new SQLiteParameter("@day", Time.SQLiteDateFormat()));
+            SQLiteCommand cmd = new SQLiteCommand("SELECT Date FROM Registry where Date < @day ORDER BY Date DESC LIMIT 1", _connection);
+                        cmd.Parameters.Add(new SQLiteParameter("@day", Time.SqLiteDateFormat()));
             
             using (SQLiteDataReader rdr = cmd.ExecuteReader())
             {
                 while (rdr.Read())
-                    return rdr.GetString(0);
-                
+                    return rdr.GetString(0);            
             }
             return String.Empty;
         }
 
+        public Dictionary<int, string> GetDrawnPeople(HashSet<int> numbers)
+        {
+            var ret = new Dictionary<int, string>();
+            var par = string.Join(",", numbers);
+            var cmd = new SQLiteCommand($"SELECT Id,Name,Surname FROM Students where Id IN({par})",_connection);
+            cmd.Parameters.Add(new SQLiteParameter("@param", string.Join(",", numbers)));
+            using (SQLiteDataReader rdr = cmd.ExecuteReader())
+            {
+                Console.WriteLine(rdr.HasRows);
+                while (rdr.Read())
+                    ret.Add(rdr.GetInt32(0),rdr.GetString(1)+" "+rdr.GetString(2));
+            }
+            return ret;
+        }
+
+        public void AddRemoveUserPresence(int id,string date, bool insert = true)
+        {
+            date = "\"" + date + "\"";
+            var qry = insert ? $"INSERT INTO Registry VALUES({date},{id})" : $"DELETE FROM Registry WHERE Date = {date} AND Student = {id}";
+            SQLiteCommand cmd = new SQLiteCommand(qry);
+            //cmd.Parameters.Add(new SQLiteParameter("@param1",id));
+            //cmd.Parameters.Add(new SQLiteParameter("@param2", date));
+            cmd.Connection = _connection;
+            cmd.ExecuteReader();
+//            Console.WriteLine(
+//            cmd.ExecuteNonQuery());
+        }
     }
 }

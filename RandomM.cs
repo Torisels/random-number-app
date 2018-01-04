@@ -6,14 +6,14 @@ namespace RandomNumberApp
 {
     class RandomM
     {
-        private decimal[] _randomDecimals = new decimal[30];
+        private readonly decimal[] _randomDecimals = new decimal[30];
         private readonly Dictionary<int, int> _probability;
 
         private decimal _space;
 
         public RandomM(Dictionary<int, int> probability)
         {
-            generateDoubles();
+            GenerateDoubles();
             _probability = probability;
         }
 
@@ -28,7 +28,7 @@ namespace RandomNumberApp
             return people;
         }
 
-        private void generateDoubles()
+        private void GenerateDoubles()
         {
             var rn = new Random();
             for (int i = 0; i < 30; i++)
@@ -50,14 +50,13 @@ namespace RandomNumberApp
         {
             decimal lastPos = 0;
             decimal currentPos = 0;
-            for (int i = 1; i <= _probability.Count; i++)
+            for (var i = 1; i <= _probability.Count; i++)
             {
                 currentPos +=_space * _probability[i];
                 if (generatedNumber >= lastPos && generatedNumber < currentPos)
                     return i;
                 lastPos = currentPos;
             }
-          
             return -1; 
         }
     }
