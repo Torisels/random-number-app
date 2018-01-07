@@ -14,7 +14,7 @@ namespace RandomNumberApp
 
         public int GetBellOffset()
         {
-            using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM bell_offest", _connection))
+            using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM bell_offset", _connection))
             {
                 using (var reader = cmd.ExecuteReader())
                 { 

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
-
+using System.Windows.Media.Animation;
+using WPFCustomMessageBox;
 namespace RandomNumberApp
 {
     public partial class MainForm : Form
@@ -23,54 +25,70 @@ namespace RandomNumberApp
             InitializeComponent();
             CustomInitialization();
             _db = new Db();
-            _time = new Time(_db);
             _ssh = new Ssh();
             _sql = _ssh.EstablishMySQLConnection();
             handleLessonTime();
-
-
-
-
-   ;
+            _time = new Time(_db, _sql.GetBellOffset());
         }
 
 
         private void btnLosuj_Click(object sender, EventArgs e)
         {
-            //            btnLosuj.Enabled = false;
-            //            progressBar1.Visible = true;
-            //            progressBar1.Style = ProgressBarStyle.Marquee;
-            //
-            //            await _connection.SendRequest();
-            //
-            //            btnLosuj.Enabled = true;
-            //            progressBar1.Visible = false;
-
-
-
-                var rand = new RandomM(_db.GetProbability());
-                var randomPeopleHashSet = rand.Randomize();
-
-                var fullRandomPeople = _db.GetDrawnPeople(randomPeopleHashSet);
-                
-
-
-            foreach (var ee in randomPeopleHashSet)
+            var s = _time.GetCurrentTime().ToString("dd-MM-yyyy");
+            HashSet<int> people;
+            if (_db.CheckIfDrawnToday(_time.verifiedDateString, out people))
             {
-                AddElementToDataGridView(ee, fullRandomPeople[ee],false);
+                var d = CustomMessageBox.ShowYesNoCancel(
+                    $"W dniu {s} było przeprowadzone losowanie. Nowe losowanie usunie poprzedni zapis. Czy chcesz kontynować?",
+                    "Uwaga!", "Tak", "Wczytaj poprzedni zapis", "Anuluj");
+                if (d == MessageBoxResult.Cancel)
+                    return;
+                if (d == MessageBoxResult.Yes)
+                    FillList();
+                if (d == MessageBoxResult.No)
+                {
+                    FillList(people);
+                }
             }
-
+            else
+            {
+                FillList();
+            }
+        
         }
 
-//        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-//        {
-//            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
-//            {
-//                var x = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
-//                Console.WriteLine("sss"+x);
-//            }
-//        }
+        private void FillList(HashSet<int> prop = null)
+        {
 
+            dataGridView1.Rows.Clear();
+            dataGridView1.Refresh();
+
+            HashSet<int> randomPeopleHashSet = null;
+            if (prop == null)
+            {
+                var rand = new RandomM(_db.GetProbability());
+                 randomPeopleHashSet = rand.Randomize();
+            }
+            else
+            {
+                 randomPeopleHashSet = prop;
+            }
+           
+            var fullRandomPeople = _db.GetDrawnPeople(randomPeopleHashSet);
+            _db.InsertDrawnPeople(randomPeopleHashSet, _time.verifiedDateString);
+
+            var propp = _db.GetProbabilityWithDate(_time.verifiedDateString);
+
+            bool g = false;
+            foreach (var ee in randomPeopleHashSet)
+            {
+
+                if (prop != null) 
+                g = propp[ee] == 1;
+
+                AddElementToDataGridView(ee, fullRandomPeople[ee], g);
+            }
+        }
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && e.ColumnIndex == 2)
@@ -128,18 +146,18 @@ namespace RandomNumberApp
 
         public async void handleLessonTime()
         {
-            await Task.Delay(1000);
+            await Task.Delay(50);
             await Task.Run(() =>
             {
               
                 while (true)
                 {
-                    if (!_time.checkIfLessonIsToday())
+                    if (!_time.LessonToday)
                     {
                         SetTextOnTimeLabel("Nie ma dzisiaj lekcji.");
                         return;
                     }
-                    if (DateTime.Now>_time.getTodayEndLessonTime())
+                    if (_time.GetCurrentTime()>_time.getTodayEndLessonTime())
                     {
                         SetTextOnTimeLabel("Lekcje skończyły się.");
                         return;
@@ -149,11 +167,11 @@ namespace RandomNumberApp
 
                     if (lesson == -1)
                     {
-                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: "+ Time.GetTimeDifference(_time.MasterDate, _time.getLessonTimeStart(_time.GetNearestLesson())));
+                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: "+ Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeStart(_time.GetNearestLesson())));
  
                         return;
                     }
-                        SetTextOnTimeLabel("Do końca lekcji pozostało: "+ Time.GetTimeDifference(_time.MasterDate, _time.getLessonTimeEnd(lesson)));
+                        SetTextOnTimeLabel("Do końca lekcji pozostało: "+ Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeEnd(lesson)));
                     
                 }
             });
@@ -171,6 +189,11 @@ namespace RandomNumberApp
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
         {
 
         }

@@ -11,10 +11,12 @@ namespace RandomNumberApp
     class Time
     {
 
-        public DateTime MasterDate;
+        private DateTime MasterDate;
+
+        public bool LessonToday = false;
 
         /*bells fetched from Db*/
-        private Dictionary<int, BellTime> _bellsDictionary;
+        private readonly Dictionary<int, BellTime> _bellsDictionary;
         private int _numberOfLesson = -1;
 
         private TimeSpan _bellOffset;
@@ -25,19 +27,18 @@ namespace RandomNumberApp
         private readonly Db _db;
 
         public string verifiedDateString;
+        public int BellOffset;
 
-        public Time(Db db)
+        public Time(Db db,int belloffset)
         {
           RefreshTime();
           _dayOfWeek = (int)MasterDate.DayOfWeek;
           _db = db;
-          getBells();
-          verifiedDateString = Time.SqLiteDateFormat(); //TODO change upgrade
+          _bellsDictionary = _db.getBells();
+          LessonToday = VerifyDate();
+            BellOffset = belloffset;
         }
-        private void getBells()
-        {
-            _bellsDictionary = _db.getBells();
-        }
+
 
         public int DetermineNumberOfLesson()
         {
@@ -50,6 +51,17 @@ namespace RandomNumberApp
             return -1;
         }
 
+        public bool VerifyDate()
+        {
+            verifiedDateString = SqLiteDateFormatCustom(MasterDate);//TODO change to string.empty
+            if (_db.GetLessonsForToday(_dayOfWeek) != null)
+            {
+                verifiedDateString = SqLiteDateFormatCustom(MasterDate);
+                return true;
+            }
+            return false;
+        }
+
 
         private void getRingOffsetFromConfig()
         {
@@ -59,7 +71,7 @@ namespace RandomNumberApp
 
         public bool checkIfLessonIsToday()
         {
-            List<int> lessons = _db.getLessonsForToday(_dayOfWeek);
+            List<int> lessons = _db.GetLessonsForToday(_dayOfWeek);
             if (lessons.Count == 0)
                 return false;
 
@@ -87,7 +99,7 @@ namespace RandomNumberApp
         {
             foreach (var lesson in _todayLessons)
             {
-                if (MasterDate <= _bellsDictionary[lesson].TimeStart && MasterDate <= _bellsDictionary[lesson].TimeEnd)
+                if (MasterDate <= _bellsDictionary[lesson].TimeStart)
                     return lesson;
             }
 
@@ -104,7 +116,6 @@ namespace RandomNumberApp
 
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
-            // Unix timestamp is seconds past epoch
             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
@@ -112,16 +123,20 @@ namespace RandomNumberApp
 
         public void RefreshTime()
         {
-            if(Properties.Settings.Default.TImeOffsetSignNegative)
-                MasterDate = DateTime.Now - _bellOffset;
-            else
-                MasterDate = DateTime.Now + _bellOffset;
+            MasterDate = DateTime.Now.AddSeconds(BellOffset);
+        }
+
+        public DateTime GetCurrentTime()
+        {
+            RefreshTime();
+            return MasterDate;
         }
 
         public static string SqLiteDateFormat()
         {
             return DateTime.Now.ToString("yyyy-MM-dd");
         }
+
         public static string SqLiteDateFormatCustom(DateTime date)
         {
             return date.ToString("yyyy-MM-dd");
@@ -135,11 +150,11 @@ namespace RandomNumberApp
 
         public BellTime(string start, string end)
         {
-            TimeStart = parse(start);
-            TimeEnd = parse(end);
+            TimeStart = Parse(start);
+            TimeEnd = Parse(end);
         }
 
-        public static DateTime parse(string time1)
+        public static DateTime Parse(string time1)
         {
             if (!DateTime.TryParseExact(time1, "HH:mm", CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out var dt))
@@ -148,9 +163,6 @@ namespace RandomNumberApp
             }
             return dt;
         }
-
-
-
 
     }
 }
