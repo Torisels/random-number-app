@@ -17,7 +17,6 @@ namespace RandomNumberApp
         private readonly Time _time;
         private readonly Sql _sql;
         private readonly Db _db;
-        private RandomM _rand;
         private readonly Ssh _ssh;
 
         public MainForm()
@@ -37,8 +36,7 @@ namespace RandomNumberApp
         private void btnLosuj_Click(object sender, EventArgs e)
         {
             var s = _time.GetCurrentTime().ToString("dd-MM-yyyy");
-            HashSet<int> people;
-            if (_db.CheckIfDrawnToday(_time.verifiedDateString, out people))
+            if (_db.CheckIfDrawnToday(_time.VerifiedDateString, out var people))
             {
                 var d = CustomMessageBox.ShowYesNoCancel(
                     $"W dniu {s} było przeprowadzone losowanie. Nowe losowanie usunie poprzedni zapis. Czy chcesz kontynować?",
@@ -77,9 +75,9 @@ namespace RandomNumberApp
             }
            
             var fullRandomPeople = _db.GetDrawnPeople(randomPeopleHashSet);
-            _db.InsertDrawnPeople(randomPeopleHashSet, _time.verifiedDateString);
+            _db.InsertDrawnPeople(randomPeopleHashSet, _time.VerifiedDateString);
 
-            var propp = _db.GetProbabilityWithDate(_time.verifiedDateString);
+            var propp = _db.GetProbabilityWithDate(_time.VerifiedDateString);
 
             bool g = false;
             foreach (var ee in randomPeopleHashSet)
@@ -96,7 +94,7 @@ namespace RandomNumberApp
             if (e.RowIndex >= 0 && e.ColumnIndex == 2)
             {
                 bool current = !(bool) dataGridView1.Rows[e.RowIndex].Cells[2].Value;
-                _db.AddRemoveUserPresence((int)dataGridView1.Rows[e.RowIndex].Cells[0].Value, _time.verifiedDateString , current);
+                _db.AddRemoveUserPresence((int)dataGridView1.Rows[e.RowIndex].Cells[0].Value, _time.VerifiedDateString , current);
 
                 dataGridView1.Rows[e.RowIndex].Cells[2].Value = current;
             }
@@ -158,7 +156,7 @@ namespace RandomNumberApp
                         SetTextOnTimeLabel("Nie ma dzisiaj lekcji.");
                         return;
                     }
-                    if (_time.GetCurrentTime() > _time.getTodayEndLessonTime())
+                    if (_time.GetCurrentTime() > _time.GetTodayEndLessonTime())
                     {
                         SetTextOnTimeLabel("Lekcje skończyły się.");
                         return;
@@ -168,11 +166,11 @@ namespace RandomNumberApp
 
                     if (lesson == -1)
                     {
-                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: " + Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeStart(_time.GetNearestLesson())));
+                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: " + Time.GetTimeDifference(_time.GetCurrentTime(), _time.GetLessonTimeStart(_time.GetNearestLesson())));
 
                         return;
                     }
-                    SetTextOnTimeLabel("Do końca lekcji pozostało: " + Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeEnd(lesson)));
+                    SetTextOnTimeLabel("Do końca lekcji pozostało: " + Time.GetTimeDifference(_time.GetCurrentTime(), _time.GetLessonTimeEnd(lesson)));
 
                 }
             });

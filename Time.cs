@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Configuration;
 using System.Globalization;
 
 namespace RandomNumberApp
@@ -11,28 +8,27 @@ namespace RandomNumberApp
     class Time
     {
 
-        private DateTime MasterDate;
+        private DateTime _masterDate;
 
-        public bool LessonToday = false;
+        public bool LessonToday;
 
         /*bells fetched from Db*/
         private readonly Dictionary<int, BellTime> _bellsDictionary;
         private int _numberOfLesson = -1;
 
-        private TimeSpan _bellOffset;
         private readonly int _dayOfWeek;
 
 
         private List<int> _todayLessons;
         private readonly Db _db;
 
-        public string verifiedDateString;
+        public string VerifiedDateString;
         public int BellOffset;
 
         public Time(Db db,int belloffset)
         {
           RefreshTime();
-          _dayOfWeek = (int)MasterDate.DayOfWeek;
+          _dayOfWeek = (int)_masterDate.DayOfWeek;
           _db = db;
           _bellsDictionary = _db.getBells();
           LessonToday = VerifyDate();
@@ -45,7 +41,7 @@ namespace RandomNumberApp
             if (_bellsDictionary == null) return -1;
             foreach (var o in _bellsDictionary)
             {
-                if (MasterDate >= o.Value.TimeStart && MasterDate <= o.Value.TimeEnd)
+                if (_masterDate >= o.Value.TimeStart && _masterDate <= o.Value.TimeEnd)
                     return o.Key;
             }
             return -1;
@@ -53,25 +49,18 @@ namespace RandomNumberApp
 
         public bool VerifyDate()
         {
-            verifiedDateString = SqLiteDateFormatCustom(MasterDate);//TODO change to string.empty
+            VerifiedDateString = SqLiteDateFormatCustom(_masterDate);//TODO change to string.empty
             var list = _db.GetLessonsForToday(_dayOfWeek);
             if (list != null)
             {
                 _todayLessons = list;
-                verifiedDateString = SqLiteDateFormatCustom(MasterDate);
+                VerifiedDateString = SqLiteDateFormatCustom(_masterDate);
                 return true;
             }
             return false;
         }
 
-
-        private void getRingOffsetFromConfig()
-        {
-            _bellOffset = new TimeSpan(0, Properties.Settings.Default.TimeOffsetMin,
-                Properties.Settings.Default.TimeOffsetSec);
-        }
-
-        public bool checkIfLessonIsToday()
+        public bool CheckIfLessonIsToday()
         {
             List<int> lessons = _db.GetLessonsForToday(_dayOfWeek);
             if (lessons.Count == 0)
@@ -81,18 +70,18 @@ namespace RandomNumberApp
             return true;
         }
 
-        public DateTime getTodayEndLessonTime()
+        public DateTime GetTodayEndLessonTime()
         {
             int max = _todayLessons.Max();
             return _bellsDictionary[max].TimeEnd;
         }
 
-        public DateTime getLessonTimeStart(int lesson)
+        public DateTime GetLessonTimeStart(int lesson)
         {
             return _bellsDictionary[lesson].TimeStart;
         }
 
-        public DateTime getLessonTimeEnd(int lesson)
+        public DateTime GetLessonTimeEnd(int lesson)
         {
             return _bellsDictionary[lesson].TimeEnd;
         }
@@ -101,7 +90,7 @@ namespace RandomNumberApp
         {
             foreach (var lesson in _todayLessons)
             {
-                if (MasterDate <= _bellsDictionary[lesson].TimeStart)
+                if (_masterDate <= _bellsDictionary[lesson].TimeStart)
                     return lesson;
             }
 
@@ -118,20 +107,20 @@ namespace RandomNumberApp
 
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
         }
 
         public void RefreshTime()
         {
-            MasterDate = DateTime.Now.AddSeconds(BellOffset);
+            _masterDate = DateTime.Now.AddSeconds(BellOffset);
         }
 
         public DateTime GetCurrentTime()
         {
             RefreshTime();
-            return MasterDate;
+            return _masterDate;
         }
 
         public static string SqLiteDateFormat()
