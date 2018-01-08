@@ -1,35 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Media.Animation;
 using WPFCustomMessageBox;
 namespace RandomNumberApp
 {
     public partial class MainForm : Form
     {
-
-        private static MainForm UiChanger;
+        private static MainForm _uiChanger;
         private readonly Time _time;
-        private readonly Sql _sql;
         private readonly Db _db;
-        private readonly Ssh _ssh;
 
         public MainForm()
         {
-            UiChanger = this;
+            _uiChanger = this;
             InitializeComponent();
             CustomInitialization();
             _db = new Db();
-            _ssh = new Ssh();
-            _sql = _ssh.EstablishMySqlConnection();
+            var ssh = new Ssh();
+            var sql = ssh.EstablishMySqlConnection();
 
-            _time = new Time(_db, _sql.GetBellOffset());
-            handleLessonTime();
+            _time = new Time(_db, sql.GetBellOffset());
+            HandleLessonTime();
         }
 
 
@@ -63,7 +57,7 @@ namespace RandomNumberApp
             dataGridView1.Rows.Clear();
             dataGridView1.Refresh();
 
-            HashSet<int> randomPeopleHashSet = null;
+            HashSet<int> randomPeopleHashSet;
             if (prop == null)
             {
                 var rand = new RandomM(_db.GetProbability());
@@ -99,11 +93,6 @@ namespace RandomNumberApp
                 dataGridView1.Rows[e.RowIndex].Cells[2].Value = current;
             }
         }
-        void dataGridView1_SelectionChanged(object sender, EventArgs e)
-        {
-            if (dataGridView1.SelectedCells.Count > 0)
-                dataGridView1.ClearSelection();
-        }
 
         private void AddElementToDataGridView(int number, string name,bool checkbox)
         {
@@ -122,29 +111,17 @@ namespace RandomNumberApp
         //this method display how much time is left till the end of the lesson
         public static void SetTextOnTimeLabel(string s)
         {
-            if (UiChanger.labelTillTheEnd.InvokeRequired)
+            if (_uiChanger.labelTillTheEnd.InvokeRequired)
             {
                 Action<string> method = SetTextOnTimeLabel;
-                UiChanger.BeginInvoke(method, s);
+                _uiChanger.BeginInvoke(method, s);
             }
             else
             {
-                UiChanger.labelTillTheEnd.Text = s;
+                _uiChanger.labelTillTheEnd.Text = s;
             }
         }
-
-        public void test()
-        {
-           //Time t = new Time();
-            Console.WriteLine(
-            Time.GetTimeDifference(DateTime.Parse("16:14"), DateTime.Parse("16:50")));
-       //     t.checkIfLessonIsToday();
-            RandomM m = new RandomM(new Dictionary<int, int>{});
-            Console.WriteLine("xd");
-
-        }
-
-        public  void handleLessonTime()
+        public void HandleLessonTime()
         {
           Thread.Sleep(50);
             var t = new Task(() =>
@@ -175,27 +152,6 @@ namespace RandomNumberApp
                 }
             });
           t.Start();
-        }
-
-        private void labelTillTheEnd_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Console.WriteLine(
-            _sql.GetBellOffset());
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

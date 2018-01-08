@@ -30,12 +30,14 @@ namespace RandomNumberApp
 
         public Sql EstablishMySqlConnection()
         {
-            MySqlConnectionStringBuilder connString = new MySqlConnectionStringBuilder();
-            connString.Server = _config["dbhost"];
-            connString.UserID = _config["dbuser"];
-            connString.Password = _config["dbpass"];
-            connString.Database = _config["dbname"];
-            connString.Port = 3307;
+            MySqlConnectionStringBuilder connString = new MySqlConnectionStringBuilder
+            {
+                Server = _config["dbhost"],
+                UserID = _config["dbuser"],
+                Password = _config["dbpass"],
+                Database = _config["dbname"],
+                Port = 3307
+            };
             return new Sql(connString.ToString());
         }
 

@@ -81,7 +81,6 @@
             this.dataGridView1.Size = new System.Drawing.Size(319, 235);
             this.dataGridView1.TabIndex = 3;
             this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellClick);
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // Column1
             // 
@@ -153,7 +152,6 @@
             this.labelTillTheEnd.Size = new System.Drawing.Size(27, 20);
             this.labelTillTheEnd.TabIndex = 7;
             this.labelTillTheEnd.Text = "aa";
-            this.labelTillTheEnd.Click += new System.EventHandler(this.labelTillTheEnd_Click);
             // 
             // MainForm
             // 
@@ -167,7 +165,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MainMenuStrip = this.menuStripMain;
             this.Name = "MainForm";
-            this.Load += new System.EventHandler(this.MainForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.menuStripMain.ResumeLayout(false);
             this.menuStripMain.PerformLayout();
