@@ -54,8 +54,10 @@ namespace RandomNumberApp
         public bool VerifyDate()
         {
             verifiedDateString = SqLiteDateFormatCustom(MasterDate);//TODO change to string.empty
-            if (_db.GetLessonsForToday(_dayOfWeek) != null)
+            var list = _db.GetLessonsForToday(_dayOfWeek);
+            if (list != null)
             {
+                _todayLessons = list;
                 verifiedDateString = SqLiteDateFormatCustom(MasterDate);
                 return true;
             }

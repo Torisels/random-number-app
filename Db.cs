@@ -66,6 +66,7 @@ namespace RandomNumberApp
                         var v = rdr.GetString(0);
                         Console.WriteLine(v.Length);
                         lessons = v.Split(',').Select(n => Convert.ToInt32(n)).ToList();
+                        return lessons;
                     }
                     else
                     {

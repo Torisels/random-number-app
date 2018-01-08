@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -27,8 +28,9 @@ namespace RandomNumberApp
             _db = new Db();
             _ssh = new Ssh();
             _sql = _ssh.EstablishMySQLConnection();
-            handleLessonTime();
+
             _time = new Time(_db, _sql.GetBellOffset());
+            handleLessonTime();
         }
 
 
@@ -144,12 +146,11 @@ namespace RandomNumberApp
 
         }
 
-        public async void handleLessonTime()
+        public  void handleLessonTime()
         {
-            await Task.Delay(50);
-            await Task.Run(() =>
+          Thread.Sleep(50);
+            var t = new Task(() =>
             {
-              
                 while (true)
                 {
                     if (!_time.LessonToday)
@@ -157,7 +158,7 @@ namespace RandomNumberApp
                         SetTextOnTimeLabel("Nie ma dzisiaj lekcji.");
                         return;
                     }
-                    if (_time.GetCurrentTime()>_time.getTodayEndLessonTime())
+                    if (_time.GetCurrentTime() > _time.getTodayEndLessonTime())
                     {
                         SetTextOnTimeLabel("Lekcje skończyły się.");
                         return;
@@ -167,14 +168,15 @@ namespace RandomNumberApp
 
                     if (lesson == -1)
                     {
-                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: "+ Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeStart(_time.GetNearestLesson())));
- 
+                        SetTextOnTimeLabel("Najbliższa lekcja rozpocznie się za: " + Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeStart(_time.GetNearestLesson())));
+
                         return;
                     }
-                        SetTextOnTimeLabel("Do końca lekcji pozostało: "+ Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeEnd(lesson)));
-                    
+                    SetTextOnTimeLabel("Do końca lekcji pozostało: " + Time.GetTimeDifference(_time.GetCurrentTime(), _time.getLessonTimeEnd(lesson)));
+
                 }
             });
+          t.Start();
         }
 
         private void labelTillTheEnd_Click(object sender, EventArgs e)
