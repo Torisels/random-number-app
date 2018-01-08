@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using RandomNumberApp.Properties;
 
 namespace RandomNumberApp
 {
@@ -14,7 +15,7 @@ namespace RandomNumberApp
 
         /*bells fetched from Db*/
         private readonly Dictionary<int, BellTime> _bellsDictionary;
-        private int _numberOfLesson = -1;
+
 
         private readonly int _dayOfWeek;
 
@@ -30,7 +31,7 @@ namespace RandomNumberApp
           RefreshTime();
           _dayOfWeek = (int)_masterDate.DayOfWeek;
           _db = db;
-          _bellsDictionary = _db.getBells();
+          _bellsDictionary = _db.GetBells();
           LessonToday = VerifyDate();
             BellOffset = belloffset;
         }
@@ -150,7 +151,7 @@ namespace RandomNumberApp
             if (!DateTime.TryParseExact(time1, "HH:mm", CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out var dt))
             {
-                Console.WriteLine("error");
+                Console.WriteLine(Resources.BellTime_Parse_error);
             }
             return dt;
         }

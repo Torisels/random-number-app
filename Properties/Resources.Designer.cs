@@ -59,5 +59,14 @@ namespace RandomNumberApp.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to error.
+        /// </summary>
+        internal static string BellTime_Parse_error {
+            get {
+                return ResourceManager.GetString("BellTime_Parse_error", resourceCulture);
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace RandomNumberApp
             portForwarded.Start();
         }
 
-        public Sql EstablishMySQLConnection()
+        public Sql EstablishMySqlConnection()
         {
             MySqlConnectionStringBuilder connString = new MySqlConnectionStringBuilder();
             connString.Server = _config["dbhost"];
@@ -39,18 +39,12 @@ namespace RandomNumberApp
             return new Sql(connString.ToString());
         }
 
-        private void Disconnect()
-        {
-            _client.Disconnect();
-        }
-
         public Dictionary<string, string> GetSettings(string path)
         {
             var document = XDocument.Load(path);
             var root = document.Root;
             var results =
-                root
-                    .Elements()
+                root?.Elements()
                     .ToDictionary(element => element.Name.ToString(), element => element.Value);
             return results;
         }

@@ -26,7 +26,7 @@ namespace RandomNumberApp
             CustomInitialization();
             _db = new Db();
             _ssh = new Ssh();
-            _sql = _ssh.EstablishMySQLConnection();
+            _sql = _ssh.EstablishMySqlConnection();
 
             _time = new Time(_db, _sql.GetBellOffset());
             handleLessonTime();

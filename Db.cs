@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.SqlServer.Server;
 
 namespace RandomNumberApp
 {
@@ -21,20 +15,7 @@ namespace RandomNumberApp
             _connection.Open();
         }
 
-        public void universalQuery(string query)
-        {
-            SQLiteCommand command = new SQLiteCommand(query, _connection);
-
-            using (SQLiteDataReader rdr = command.ExecuteReader())
-            {
-                while (rdr.Read())
-                {
-                   
-                }
-            }
-        }
-
-        public Dictionary<int, BellTime> getBells()
+        public Dictionary<int, BellTime> GetBells()
         {
             Dictionary<int, BellTime> dict = new Dictionary<int, BellTime>();
             SQLiteCommand command = new SQLiteCommand("SELECT * from Bells", _connection);
@@ -51,7 +32,7 @@ namespace RandomNumberApp
 
         public List<int> GetLessonsForToday(int day)
         {
-            var lessons = new List<int>();
+            List<int> lessons;
             SQLiteCommand cmd = new SQLiteCommand("SELECT Number FROM Lessons where Day = @day",_connection);
             cmd.Parameters.Add(new SQLiteParameter("@day", day));
          
@@ -160,16 +141,6 @@ namespace RandomNumberApp
                     ret.Add(rdr.GetInt32(0),rdr.GetString(1)+" "+rdr.GetString(2));
             }
             return ret;
-        }
-
-        public HashSet<int> GetDrawnPeople()
-        {
-            HashSet<int> ret = new HashSet<int>();
-
-
-
-
-            return null;
         }
 
         public void InsertDrawnPeople(HashSet<int> numbers,string date)

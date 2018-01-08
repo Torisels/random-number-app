@@ -2,7 +2,7 @@
 
 namespace RandomNumberApp
 {
-    class Sql
+    internal class Sql
     {
         private readonly MySqlConnection _connection;
 
